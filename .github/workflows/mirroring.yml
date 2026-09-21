@@ -16,7 +16,7 @@ concurrency:
 jobs:
   check_python_project:
     name: Check Python project
-    if: ${{ github.repository == 'Matt4401/Mirro-my_PGP' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.repository == 'Matt4401/Mirro-my_PGP' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -37,7 +37,7 @@ jobs:
         run: make
 
       - name: Check delivery binary
-        run: test -x my_pgp
+        run: pytest
 
   push_to_mirror:
     name: Push to target repository
