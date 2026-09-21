@@ -7,3 +7,11 @@
 ## main
 ##
 
+from src.parsing.parsing import parse_input
+
+def main():
+    args = parse_input()
+    print(args)
+
+if __name__ == "__main__":
+    main()
