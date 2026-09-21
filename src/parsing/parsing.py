@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 from .valids_options import SYMMETRIC_SYSTEMS
 from .parser import build_parser
+from sympy import isprime
 
 
 @dataclass(frozen=True) # just to make it secure
@@ -41,6 +42,10 @@ def _validate_arguments(arguments, parser):
         parser.error("-g can only be used with the rsa crypto system")
     if mode == "g" and arguments.key is not None:
         parser.error("a key cannot be used with -g")
+    if mode == "g" :
+        for prime in arguments.primes:
+           if not isprime(prime):
+               parser.error(f"{prime} is not a prime number")
     if arguments.single_block and arguments.crypto_system not in SYMMETRIC_SYSTEMS:
         parser.error("-b can only be used with xor, aes, pgp-xor or pgp-aes")
     if mode != "g" and arguments.key is None:
