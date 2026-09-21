@@ -24,3 +24,12 @@ def inv_shift_rows(state: list[list[int]]) -> list[list[int]]:
 def add_round_key(state: list[list[int]], round_key: list[list[int]]) -> list[list[int]]:
     """Apply the AddRoundKey transformation to the state."""
     return [[s_byte ^ k_byte for s_byte, k_byte in zip(s_row, k_row)] for s_row, k_row in zip(state, round_key)]
+
+def mix_columns(state: list[list[int]], mix_matrix: list[list[int]]) -> list[list[int]]:
+    """Apply the MixColumns transformation to the state."""
+    return [[sum(mix_matrix[i][j] * state[j][k] for j in range(4)) % 256 for k in range(4)] for i in range(4)]
+
+def inv_mix_columns(state: list[list[int]], inv_mix_matrix: list[list[int]]) -> list[list[int]]:
+    """Apply the InvMixColumns transformation to the state."""
+    return [[sum(inv_mix_matrix[i][j] * state[j][k] for j in range(4)) % 256 for k in range(4)] for i in range(4)]
+
