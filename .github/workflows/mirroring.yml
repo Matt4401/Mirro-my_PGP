@@ -1,0 +1,55 @@
+name: my_pgp mirror CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  TARGET_REPO_URL: "git@github.com:EpitechPGE3-2026/G-CNA-500-NAN-5-1-mypgp-1.git"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check_python_project:
+    name: Check Python project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install project dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Check Python syntax
+        run: python -m compileall -q main.py src
+
+      - name: Build delivery binary
+        run: make
+
+      - name: Check delivery binary
+        run: test -x my_pgp
+
+  push_to_mirror:
+    name: Push to target repository
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Mirror repository
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: ${{ env.TARGET_REPO_URL }}
+          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
