@@ -37,7 +37,7 @@ jobs:
         run: make
 
       - name: Check delivery binary
-        run: test -x my_pgp
+        run: pytest
 
   push_to_mirror:
     name: Push to target repository
