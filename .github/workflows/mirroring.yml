@@ -40,7 +40,7 @@ jobs:
 
   push_to_mirror:
     name: Push to target repository
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.repository == 'Matt4401/Mirro-my_PGP' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
