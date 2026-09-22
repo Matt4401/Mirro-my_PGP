@@ -10,6 +10,13 @@ import argparse
 
 from .valids_options import CRYPTO_SYSTEMS, SYMMETRIC_SYSTEMS
 
+
+def parse_prime(value: str) -> int:
+	try:
+		return int(value, 0)
+	except ValueError:
+		return int(value, 16)
+
 def build_parser():
 
 	parser = argparse.ArgumentParser(prog="./my_pgp", usage="%(prog)s CRYPTO_SYSTEM MODE [OPTIONS] [key]",
@@ -27,7 +34,7 @@ def build_parser():
 	modes = parser.add_mutually_exclusive_group(required=True)
 	modes.add_argument("-c", dest="cipher", action="store_true", help="MESSAGE is clear and we want to cipher it")
 	modes.add_argument("-d", dest="decipher", action="store_true", help="MESSAGE is ciphered and we want to decipher it")
-	modes.add_argument("-g", dest="primes", nargs=2, metavar=("P", "Q"), type=int, help="RSA only: don't read a MESSAGE, but instead generate a public and private key pair from the prime number P and Q")
+	modes.add_argument("-g", dest="primes", nargs=2, metavar=("P", "Q"), type=parse_prime, help="RSA only: don't read a MESSAGE, but instead generate a public and private key pair from the prime number P and Q")
 	parser.add_argument("-b", dest="single_block", action="store_true", help="process one block only")
 	parser.add_argument("key", nargs="?", help="Key used to cipher/decipher MESSAGE (incompatible with -g MODE)")
 	
