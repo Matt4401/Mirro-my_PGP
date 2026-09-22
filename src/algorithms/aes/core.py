@@ -1,7 +1,7 @@
-from algorithms.aes.state import state_to_matrix, matrix_to_state
-from algorithms.aes.maths import add_round_key, sub_bytes, shift_rows, mix_columns, inv_sub_bytes, inv_shift_rows, inv_mix_columns
-from algorithms.aes.keys import key_expansion
-from algorithms.aes.constants import SBOX, INV_SBOX, RCON
+from .state import state_to_matrix, matrix_to_state
+from .maths import add_round_key, sub_bytes, shift_rows, mix_columns, inv_sub_bytes, inv_shift_rows, inv_mix_columns
+from .keys import keys_expansion
+from .constants import SBOX, INV_SBOX
 
 def get_key_matrix(key_schedule: list[bytes], round_idx: int) -> list[list[int]]:
     """Extracts 4 words (16 bytes) for the given round and converts them to a 4x4 state matrix."""

@@ -5,7 +5,7 @@
 ## keys
 ##
 
-from algorithms.aes.constants import SBOX, RCON
+from .constants import SBOX, RCON
 
 def rot_words(word: bytes) -> bytes:
     """
