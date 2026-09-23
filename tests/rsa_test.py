@@ -13,7 +13,7 @@ def load_1024_bit_primes() -> tuple[int, int]:
     primes_file = Path(__file__).parent / "primes" / "1024_rsa_primes.json"
     with primes_file.open(encoding="utf-8") as file:
         data = json.load(file)
-    primes = data["nombres_premiers"][:2]
+    primes = data["prime_numbers"][:2]
     return tuple(int(prime["hexadecimal"], 16) for prime in primes)
 
 
