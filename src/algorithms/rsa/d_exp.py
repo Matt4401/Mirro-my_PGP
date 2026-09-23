@@ -5,8 +5,6 @@
 ## d_exp
 ##
 
-## Voir la feuille pour plus de détails sur le calcul de d.
-
 def extended_euclidean_algorithm(a: int, b: int) -> tuple[int, int, int]:
     """Extended Euclidean Algorithm.
     a = e and b = lambda_n

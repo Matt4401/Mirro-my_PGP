@@ -6,10 +6,10 @@
 ##
 
 from src.parsing.parsing import ParsedArguments
-from src.algorithms.rsa.n_mod import n_mod
-from src.algorithms.rsa.totient_carmichael import get_lambda_n
-from src.algorithms.rsa.fermat_biggest_prime import get_biggest_fermat_prime
-from src.algorithms.rsa.d_exp import get_d_exp
+from .n_mod import n_mod
+from .totient_carmichael import get_lambda_n
+from .fermat_biggest_prime import get_biggest_fermat_prime
+from .d_exp import get_d_exp
 
 def rsa_key_values(primes: tuple[int, int]) -> tuple[int, int, int]:
     n = n_mod(primes)
