@@ -11,10 +11,40 @@ import sys
 
 from src.parsing.parsing import parse_input
 from src.utils.endianness import hex_to_bytes, bytes_to_hex
+from src.utils.endianness import bytes_to_int, int_to_bytes
 from src.utils.blocks import split_into_blocks, pad_block
 from src.algorithms.aes.keys import keys_expansion
 from src.algorithms.aes.core import aes_encrypt_block, aes_decrypt_block
 from src.algorithms.xor import xor
+from src.algorithms.rsa.core import rsa_key_values
+
+
+def parse_rsa_key(key: str) -> tuple[int, int]:
+    parts = key.split("-")
+    if len(parts) != 2 or not all(parts):
+        raise ValueError("RSA key must have the format exponent-modulus")
+    try:
+        return bytes_to_int(bytes.fromhex(parts[0])), bytes_to_int(bytes.fromhex(parts[1]))
+    except ValueError as error:
+        raise ValueError("RSA key must contain hexadecimal numbers") from error
+
+
+def format_rsa_number(number: int) -> str:
+    if number < 0:
+        raise ValueError("RSA values cannot be negative")
+    length = max(1, (number.bit_length() + 7) // 8)
+    return int_to_bytes(number, length).hex()
+
+
+def process_rsa(message: bytes, key: str, mode: str) -> bytes:
+    exponent, modulus = parse_rsa_key(key)
+    if modulus <= 0:
+        raise ValueError("RSA modulus must be positive")
+    value = bytes_to_int(message)
+    if value >= modulus:
+        raise ValueError("message must be smaller than the RSA modulus")
+    result = pow(value, exponent, modulus)
+    return int_to_bytes(result, max(1, (result.bit_length() + 7) // 8))
 
 
 def process_aes(message: bytes, key: bytes, mode: str, single_block: bool) -> bytes:
@@ -62,11 +92,24 @@ def main():
         args = parse_input()
 
         if args.mode == "g":
-            raise NotImplementedError("RSA key generation (-g) is not implemented yet.")
+            n, e, d = rsa_key_values(args.primes)
+            print(f"public key: {format_rsa_number(e)}-{format_rsa_number(n)}")
+            print(f"private key: {format_rsa_number(d)}-{format_rsa_number(n)}")
+            return
 
         raw_data = sys.stdin.buffer.read()
         if args.single_block and raw_data.endswith(b"\n"):
             raw_data = raw_data[:-1]
+
+        if args.crypto_system == "rsa":
+            if args.mode == "c":
+                result = process_rsa(raw_data.rstrip(b"\n"), args.key, args.mode)
+                print(result.hex(), end="")
+            else:
+                ciphered = hex_to_bytes(raw_data.decode("ascii").strip())
+                result = process_rsa(ciphered, args.key, args.mode)
+                sys.stdout.buffer.write(result)
+            return
 
         key_bytes = hex_to_bytes(args.key)
         if args.mode == "c":
