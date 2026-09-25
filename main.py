@@ -63,9 +63,9 @@ def process_aes(message: bytes, key: bytes, mode: str, single_block: bool) -> by
     output = []
     for b in blocks:
         if mode == "c":
-            output.append(aes_encrypt_block(b, key_schedule))
+            output.append(aes_encrypt_block(b[::-1], key_schedule))
         else:
-            output.append(aes_decrypt_block(b, key_schedule))
+            output.append(aes_decrypt_block(b, key_schedule)[::-1])
     return b"".join(output)
 
 
@@ -83,7 +83,13 @@ def process_xor(message: bytes, key: bytes, mode: str, single_block: bool) -> by
         if mode == "c" and blocks and len(blocks[-1]) < block_size:
             blocks[-1] = pad_block(blocks[-1], block_size)
 
-    output = [xor(b, key[:len(b)]) if mode == "d" and len(b) < block_size else xor(b, key) for b in blocks]
+    output = []
+    for b in blocks:
+        if mode == "c":
+            output.append(xor(b[::-1], key))
+        else:
+            out_b = xor(b, key[:len(b)]) if len(b) < block_size else xor(b, key)
+            output.append(out_b[::-1])
     return b"".join(output)
 
 
@@ -98,13 +104,11 @@ def main():
             return
 
         raw_data = sys.stdin.buffer.read()
-        if args.single_block and raw_data.endswith(b"\n"):
-            raw_data = raw_data[:-1]
 
         if args.crypto_system == "rsa":
             if args.mode == "c":
-                result = process_rsa(raw_data.rstrip(b"\n"), args.key, args.mode)
-                print(result.hex(), end="")
+                result = process_rsa(raw_data, args.key, args.mode)
+                print(result.hex())
             else:
                 ciphered = hex_to_bytes(raw_data.decode("ascii").strip())
                 result = process_rsa(ciphered, args.key, args.mode)
@@ -125,7 +129,7 @@ def main():
             raise NotImplementedError(f"Crypto system '{args.crypto_system}' is not implemented yet.")
 
         if args.mode == "c":
-            print(bytes_to_hex(result), end="")
+            print(bytes_to_hex(result))
         else:
             sys.stdout.buffer.write(result)
 
