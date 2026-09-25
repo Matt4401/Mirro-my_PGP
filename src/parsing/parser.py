@@ -17,9 +17,15 @@ def parse_prime(value: str) -> int:
 	except ValueError:
 		return int(value, 16)
 
+class MyArgumentParser(argparse.ArgumentParser):
+	def error(self, message):
+		import sys
+		sys.stderr.write(f"{self.prog}: error: {message}\n")
+		sys.exit(84)
+
 def build_parser():
 
-	parser = argparse.ArgumentParser(prog="./my_pgp", usage="%(prog)s CRYPTO_SYSTEM MODE [OPTIONS] [key]",
+	parser = MyArgumentParser(prog="./my_pgp", usage="%(prog)s CRYPTO_SYSTEM MODE [OPTIONS] [key]",
 		description=(
 			"DESCRIPTION\n"
 			"\n"
@@ -37,6 +43,6 @@ def build_parser():
 	modes.add_argument("-g", dest="primes", nargs=2, metavar=("P", "Q"), type=parse_prime, help="RSA only: don't read a MESSAGE, but instead generate a public and private key pair from the prime number P and Q")
 	parser.add_argument("-b", dest="single_block", action="store_true", help="process one block only")
 	parser.add_argument("key", nargs="?", help="Key used to cipher/decipher MESSAGE (incompatible with -g MODE)")
-	
+
 	return parser
 
